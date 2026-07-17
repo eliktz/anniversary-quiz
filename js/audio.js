@@ -166,8 +166,19 @@ window.AudioMan = (function () {
     if (current) setVol(current.el, m ? 0 : current.targetVol);
   }
 
+  // Warm the HTTP cache for all tracks so music never arrives late on home WiFi.
+  function preload() {
+    const list = [TRACKS.question, ...TRACKS.slideshows, TRACKS.finale];
+    list.forEach((src, i) => setTimeout(() => {
+      const a = new Audio();
+      a.preload = "auto";
+      a.src = src;
+      a.load();
+    }, 1500 * (i + 1)));
+  }
+
   return {
-    unlock, resume,
+    unlock, resume, preload,
     intro: () => crossfadeTo(TRACKS.intro, "intro", MUSIC_VOL.intro, 2),
     question: () => crossfadeTo(TRACKS.question, "question", MUSIC_VOL.question, 1.8),
     slideshow: (qIndex) =>

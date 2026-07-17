@@ -76,12 +76,28 @@
     AudioMan.unlock();
     AudioMan.intro();
     AudioMan.playFanfare();
+    AudioMan.preload();
     requestWakeLock();
     Confetti.burst(innerWidth / 2, innerHeight * 0.4, 120);
     phase = "ready";
     $("#intro-first").classList.add("hidden");
     $("#intro-ready").classList.remove("hidden");
+    offerResume();
     preloadEverything();
+  }
+
+  // If a reload interrupted a game mid-way, offer to continue from that question.
+  function offerResume() {
+    const saved = parseInt(localStorage.getItem("quiz-q") || "", 10);
+    if (!(saved >= 1 && saved < window.QUESTIONS.length)) return;
+    const btn = $("#btn-resume");
+    btn.textContent = `או: להמשיך משאלה ${saved + 1} ⏩`;
+    btn.classList.remove("hidden");
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      qIndex = saved;
+      showQuestion();
+    };
   }
 
   function startQuiz() {
@@ -92,6 +108,7 @@
   // ---------- question ----------
   function showQuestion() {
     phase = "question";
+    try { localStorage.setItem("quiz-q", String(qIndex)); } catch (e) { /* private mode */ }
     const q = window.QUESTIONS[qIndex];
     AudioMan.question();
     $("#progress").textContent = `שאלה ${qIndex + 1} מתוך ${window.QUESTIONS.length}`;
@@ -272,6 +289,7 @@
   function showEnd() {
     phase = "end";
     clearTimeout(slideTimer);
+    try { localStorage.removeItem("quiz-q"); } catch (e) { /* private mode */ }
     endGuardUntil = performance.now() + 900; // don't let a double-tap restart
     $("#slide-stage").innerHTML = "";
     initEndFloaters();
@@ -319,6 +337,10 @@
   });
 
   // ---------- boot ----------
+  // Block iOS pinch-zoom (user-scalable=no is ignored since iOS 10).
+  ["gesturestart", "gesturechange"].forEach((ev) =>
+    document.addEventListener(ev, (e) => e.preventDefault()));
+
   window.addEventListener("DOMContentLoaded", () => {
     Confetti.init();
     initIntro();
