@@ -23,6 +23,10 @@ window.AudioMan = (function () {
   players.forEach((p) => { p.loop = true; p.preload = "auto"; });
   let flip = 0;
 
+  // 0.1s of silence — used to "bless" both <audio> elements inside the first
+  // user gesture so iOS Safari allows programmatic play() on them later.
+  const SILENCE = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+
   function unlock() {
     if (unlocked) return;
     unlocked = true;
@@ -30,6 +34,11 @@ window.AudioMan = (function () {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       if (ctx.state === "suspended") ctx.resume();
     } catch (e) { ctx = null; }
+    players.forEach((p) => {
+      p.src = SILENCE;
+      const pr = p.play();
+      if (pr && pr.catch) pr.catch(() => {});
+    });
   }
 
   function crossfadeTo(src, key, targetVol, seconds) {

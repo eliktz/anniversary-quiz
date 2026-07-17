@@ -84,7 +84,7 @@
       btn.addEventListener("click", () => onAnswer(i, btn));
       grid.appendChild(btn);
     });
-    $("#reveal-banner").className = "hidden";
+    $("#q-card").classList.remove("revealed");
     show("#screen-question");
     preloadFolder(q.id);
   }
@@ -130,11 +130,11 @@
     }
     const banner = $("#reveal-banner");
     banner.innerHTML =
-      `<div class="reveal-verdict">${right ? "נכון!!! 🎉" : "התשובה הנכונה:"}</div>` +
+      `<div class="reveal-verdict">${right ? "נכון!!! 🎉" : "לא נורא! התשובה הנכונה:"}</div>` +
       `<div class="reveal-answer">${q.answers[q.correct]}</div>` +
       `<div class="reveal-line">${q.reveal}</div>`;
-    banner.className = "reveal-pop";
-    setTimeout(startSlideshow, right ? 2600 : 3100);
+    $("#q-card").classList.add("revealed");
+    setTimeout(startSlideshow, right ? 2800 : 3300);
   }
 
   // ---------- slideshow ----------
@@ -223,10 +223,23 @@
     slideTimer = setTimeout(() => montageSlide(photos, idx + 1), 4600);
   }
 
+  function initEndFloaters() {
+    const wrap = $("#floaters-end");
+    if (wrap.children.length) return;
+    const picks = (window.PHOTOS.finale || []).slice(-5);
+    picks.forEach((p, i) => {
+      const d = document.createElement("div");
+      d.className = "floater f" + (i % 5);
+      d.style.backgroundImage = `url(${p.src})`;
+      wrap.appendChild(d);
+    });
+  }
+
   function showEnd() {
     phase = "end";
     clearTimeout(slideTimer);
     $("#slide-stage").innerHTML = "";
+    initEndFloaters();
     show("#screen-end");
     Confetti.burst(innerWidth / 2, innerHeight * 0.35, 150);
     const rainLoop = setInterval(() => {

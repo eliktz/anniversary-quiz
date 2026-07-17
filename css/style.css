@@ -136,7 +136,7 @@ html, body {
 }
 
 /* floating polaroids */
-#floaters { position: absolute; inset: 0; overflow: hidden; }
+#floaters, #floaters-end { position: absolute; inset: 0; overflow: hidden; }
 .floater {
   position: absolute;
   width: clamp(110px, 16vw, 200px);
@@ -262,8 +262,8 @@ html, body {
   justify-content: center;
 }
 .answer .ans-text {
-  font-size: clamp(19px, 3vw, 33px);
-  font-weight: 600;
+  font-size: clamp(22px, 3.5vw, 40px);
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -285,37 +285,29 @@ html, body {
 }
 .answer.wrong {
   opacity: 1;
+  filter: none;
   background: linear-gradient(145deg, #e87070, var(--bad));
   animation: shake 0.55s ease both;
 }
 
-#reveal-banner.reveal-pop {
-  position: fixed;
-  left: 50%;
-  bottom: max(22px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  z-index: 40;
-  background: rgba(29, 14, 42, 0.92);
-  border: 1px solid rgba(232, 197, 71, 0.5);
-  border-radius: 20px;
-  padding: 14px 34px;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.55);
-  animation: fadeUp 0.5s ease both;
-  max-width: min(92vw, 640px);
+#reveal-banner { display: none; }
+.q-card.revealed #question-text { display: none; }
+.q-card.revealed #reveal-banner { display: block; animation: fadeUp 0.5s ease both; }
+.q-card.revealed {
+  border-color: rgba(232, 197, 71, 0.55);
+  box-shadow: 0 0 40px rgba(232, 197, 71, 0.18);
 }
 .reveal-verdict {
   font-family: "Secular One", "Heebo", sans-serif;
-  font-size: clamp(20px, 3vw, 30px);
+  font-size: clamp(22px, 3.4vw, 36px);
   color: var(--gold);
 }
 .reveal-answer {
-  font-size: clamp(19px, 2.6vw, 27px);
-  font-weight: 800;
+  font-family: "Secular One", "Heebo", sans-serif;
+  font-size: clamp(24px, 3.8vw, 42px);
   margin: 2px 0;
 }
-.reveal-line { font-size: clamp(15px, 2vw, 20px); color: var(--rose); }
+.reveal-line { font-size: clamp(17px, 2.4vw, 24px); color: var(--rose); font-weight: 600; }
 
 /* ================= SLIDESHOW ================= */
 #screen-slideshow { background: #0d0612; }
