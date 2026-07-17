@@ -3,14 +3,18 @@
   const $ = (sel) => document.querySelector(sel);
   const LETTERS = ["א", "ב", "ג", "ד"];
   const SHAPES = ["♥", "★", "◆", "✿"];
-  const SLIDE_MS = 7000;
-  const FADE_MS = 1400;
+  const SLIDE_MS = 5500;
 
   let qIndex = 0;
   let phase = "intro"; // intro | ready | question | reveal | slideshow | montage | end
   let slideTimer = null;
   let slideIdx = 0;
+  let currentPhotos = [];
   let slideTapGuardUntil = 0;
+  let answerGuardUntil = 0;
+  let revealGuardUntil = Infinity;
+  let endGuardUntil = 0;
+  let revealTimer = null;
   let wakeLock = null;
 
   // ---------- helpers ----------
@@ -19,8 +23,23 @@
     $(id).classList.add("active");
   }
 
+  const preloaded = new Set();
   function preloadFolder(key) {
+    if (preloaded.has(key)) return;
+    preloaded.add(key);
     (window.PHOTOS[key] || []).forEach((p) => { const im = new Image(); im.src = p.src; });
+  }
+
+  // After the first tap, quietly warm the cache for the whole quiz in play order
+  // so slideshows never wait on the network.
+  function preloadEverything() {
+    const keys = [...window.QUESTIONS.map((q) => q.id), "finale"];
+    let i = 0;
+    (function next() {
+      if (i >= keys.length) return;
+      preloadFolder(keys[i++]);
+      setTimeout(next, 1200);
+    })();
   }
 
   async function requestWakeLock() {
@@ -31,8 +50,14 @@
     } catch (e) { /* fine — screen may sleep */ }
   }
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && wakeLock) requestWakeLock();
+    if (document.visibilityState === "visible") {
+      if (wakeLock) requestWakeLock();
+      AudioMan.resume(); // heal audio after app switch / screen lock
+    }
   });
+  // iOS sometimes needs a user gesture to resume after an interruption —
+  // the very next tap anywhere heals the audio.
+  document.addEventListener("pointerdown", () => AudioMan.resume(), true);
 
   // ---------- intro ----------
   function initIntro() {
@@ -56,7 +81,7 @@
     phase = "ready";
     $("#intro-first").classList.add("hidden");
     $("#intro-ready").classList.remove("hidden");
-    preloadFolder("q01");
+    preloadEverything();
   }
 
   function startQuiz() {
@@ -85,6 +110,7 @@
       grid.appendChild(btn);
     });
     $("#q-card").classList.remove("revealed");
+    answerGuardUntil = performance.now() + 700; // swallow trailing double-taps
     show("#screen-question");
     preloadFolder(q.id);
   }
@@ -101,9 +127,11 @@
   }
 
   function onAnswer(i, btn) {
-    if (phase !== "question") return;
+    if (phase !== "question" || performance.now() < answerGuardUntil) return;
     phase = "reveal";
+    revealGuardUntil = Infinity;
     const q = window.QUESTIONS[qIndex];
+    AudioMan.playTap();
     AudioMan.duck(0.1);
     AudioMan.playDrumroll(1.7);
     document.querySelectorAll(".answer").forEach((b) => b.classList.add("locked"));
@@ -134,18 +162,21 @@
       `<div class="reveal-answer">${q.answers[q.correct]}</div>` +
       `<div class="reveal-line">${q.reveal}</div>`;
     $("#q-card").classList.add("revealed");
-    setTimeout(startSlideshow, right ? 2800 : 3300);
+    revealGuardUntil = performance.now() + 1600; // then a tap advances early
+    revealTimer = setTimeout(startSlideshow, right ? 4200 : 4700);
   }
 
   // ---------- slideshow ----------
   function startSlideshow() {
+    clearTimeout(revealTimer);
+    revealTimer = null;
     phase = "slideshow";
     const q = window.QUESTIONS[qIndex];
     const photos = window.PHOTOS[q.id] || [];
     if (!photos.length) return nextQuestion();
     AudioMan.slideshow(qIndex);
-    AudioMan.unduck();
     slideIdx = 0;
+    currentPhotos = photos;
     slideTapGuardUntil = performance.now() + 900;
     $("#slideshow-title").textContent = q.reveal;
     renderDots(photos.length);
@@ -165,6 +196,7 @@
   function runSlide(photos, idx) {
     slideIdx = idx;
     const stage = $("#slide-stage");
+    if (stage.lastChild) stage.lastChild.classList.add("leaving");
     const p = photos[idx];
     const div = document.createElement("div");
     div.className = "slide kb" + (idx % 2);
@@ -200,6 +232,7 @@
     phase = "montage";
     AudioMan.finale();
     const photos = window.PHOTOS.finale || [];
+    currentPhotos = photos;
     $("#slideshow-title").textContent = "13 שנים של אהבה ❤️";
     renderDots(photos.length);
     show("#screen-slideshow");
@@ -211,6 +244,7 @@
     slideIdx = idx;
     const stage = $("#slide-stage");
     if (idx >= photos.length) return showEnd();
+    if (stage.lastChild) stage.lastChild.classList.add("leaving");
     const p = photos[idx];
     const div = document.createElement("div");
     div.className = "slide kb" + (idx % 2);
@@ -238,6 +272,7 @@
   function showEnd() {
     phase = "end";
     clearTimeout(slideTimer);
+    endGuardUntil = performance.now() + 900; // don't let a double-tap restart
     $("#slide-stage").innerHTML = "";
     initEndFloaters();
     show("#screen-end");
@@ -247,6 +282,7 @@
       Confetti.rain(35);
     }, 1800);
     $("#btn-again").onclick = () => {
+      if (performance.now() < endGuardUntil) return;
       phase = "ready";
       $("#intro-first").classList.add("hidden");
       $("#intro-ready").classList.remove("hidden");
@@ -256,13 +292,22 @@
   }
 
   // ---------- global taps ----------
-  $("#screen-slideshow") && null;
+  // During a slideshow/montage a tap advances ONE slide (past the last -> continue).
+  // During a reveal (after a short hold) a tap moves on to the slideshow.
   document.addEventListener("click", (e) => {
-    if ((phase === "slideshow" || phase === "montage") &&
-        performance.now() > slideTapGuardUntil &&
-        !e.target.closest("#btn-mute")) {
-      if (phase === "slideshow") endSlideshow();
-      else { clearTimeout(slideTimer); $("#slide-stage").innerHTML = ""; showEnd(); }
+    if (e.target.closest("#btn-mute")) return;
+    const now = performance.now();
+    if (phase === "slideshow" && now > slideTapGuardUntil) {
+      clearTimeout(slideTimer);
+      slideTapGuardUntil = now + 350;
+      if (slideIdx + 1 < currentPhotos.length) runSlide(currentPhotos, slideIdx + 1);
+      else endSlideshow();
+    } else if (phase === "montage" && now > slideTapGuardUntil) {
+      clearTimeout(slideTimer);
+      slideTapGuardUntil = now + 350;
+      montageSlide(currentPhotos, slideIdx + 1);
+    } else if (phase === "reveal" && now > revealGuardUntil) {
+      startSlideshow();
     }
   });
 

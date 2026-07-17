@@ -10,7 +10,7 @@
   --rose: #ff8fa3;
   --c0: #c9485b;   /* rose */
   --c1: #d99a3d;   /* amber */
-  --c2: #b85c38;   /* terracotta */
+  --c2: #2a8f80;   /* deep teal */
   --c3: #7d4a9e;   /* violet */
   --good: #3ec97e;
   --bad: #e05252;
@@ -44,8 +44,9 @@ html, body {
   left: 14px;
   z-index: 60;
   font-size: 22px;
-  background: rgba(255, 246, 236, 0.12);
-  border: 1px solid rgba(255, 246, 236, 0.25);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  background: rgba(255, 246, 236, 0.18);
+  border: 1px solid rgba(255, 246, 236, 0.4);
   border-radius: 50%;
   width: 46px;
   height: 46px;
@@ -197,10 +198,15 @@ html, body {
   background: rgba(255, 246, 236, 0.07);
   border: 1px solid rgba(255, 246, 236, 0.14);
   border-radius: 24px;
-  padding: clamp(16px, 3vh, 34px) 28px;
+  padding: clamp(14px, 2.4vh, 28px) 28px;
   text-align: center;
   backdrop-filter: blur(8px);
   animation: fadeUp 0.55s ease both;
+  /* stable height that already fits the 3-line reveal, so the grid never jumps */
+  min-height: clamp(130px, 20vh, 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 #question-text {
   font-family: "Secular One", "Heebo", sans-serif;
@@ -241,7 +247,7 @@ html, body {
 .answer:active { transform: scale(0.97); }
 .answer.c0 { background: linear-gradient(145deg, #d95d70, var(--c0)); }
 .answer.c1 { background: linear-gradient(145deg, #e8ae55, var(--c1)); }
-.answer.c2 { background: linear-gradient(145deg, #cc7048, var(--c2)); }
+.answer.c2 { background: linear-gradient(145deg, #3fae9a, var(--c2)); }
 .answer.c3 { background: linear-gradient(145deg, #925fb5, var(--c3)); }
 
 .answer .shape {
@@ -273,7 +279,11 @@ html, body {
   outline-offset: -2px;
   animation: pulseSoft 0.5s ease-in-out infinite;
 }
-.answer.dim { opacity: 0.22; filter: saturate(0.4); }
+.answer.dim {
+  opacity: 0.4;
+  filter: grayscale(0.7) brightness(0.5);
+  transform: scale(0.96);
+}
 .answer.correct {
   opacity: 1;
   filter: none;
@@ -319,10 +329,12 @@ html, body {
   background-size: cover;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 1.3s ease;
+  transition: opacity 0.7s ease;
   will-change: transform, opacity;
 }
 .slide.visible { opacity: 1; }
+/* outgoing slide dips toward the dark background instead of double-exposing */
+.slide.leaving { opacity: 0 !important; transition: opacity 0.5s ease; }
 .slide.kb0 { animation: kenburns0 8.6s ease-in-out both; }
 .slide.kb1 { animation: kenburns1 8.6s ease-in-out both; }
 
@@ -379,12 +391,15 @@ html, body {
   position: absolute;
   bottom: max(16px, env(safe-area-inset-bottom));
   right: 22px;
-  font-size: 14px;
-  color: rgba(255, 246, 236, 0.65);
-  background: rgba(13, 6, 18, 0.45);
-  padding: 6px 14px;
+  font-size: 17px;
+  color: rgba(255, 246, 236, 0.88);
+  background: rgba(13, 6, 18, 0.55);
+  padding: 7px 16px;
   border-radius: 20px;
+  opacity: 0;
+  animation: hintIn 0.7s ease 3.2s both; /* appears once curiosity kicks in */
 }
+@keyframes hintIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ================= END ================= */
 #screen-end {

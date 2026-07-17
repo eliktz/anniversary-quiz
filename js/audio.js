@@ -1,5 +1,7 @@
 // Audio manager: music crossfades via two <audio> elements + WebAudio synth stingers.
 // Everything starts only after the first user tap (iOS requirement).
+// iPad Safari ignores HTMLMediaElement.volume, so each player is routed through a
+// WebAudio GainNode at unlock time; volume changes go through the gain when available.
 window.AudioMan = (function () {
   const TRACKS = {
     intro: "assets/audio/intro.mp3",
@@ -17,11 +19,19 @@ window.AudioMan = (function () {
   let ctx = null;
   let unlocked = false;
   let muted = false;
-  let current = null; // {el, key, targetVol}
+  let current = null; // {el, src, key, targetVol}
   let fadeTimer = null;
   const players = [new Audio(), new Audio()];
   players.forEach((p) => { p.loop = true; p.preload = "auto"; });
   let flip = 0;
+
+  function setVol(p, v) {
+    if (p._gain) p._gain.gain.value = v;
+    else p.volume = v;
+  }
+  function getVol(p) {
+    return p._gain ? p._gain.gain.value : p.volume;
+  }
 
   // 0.1s of silence — used to "bless" both <audio> elements inside the first
   // user gesture so iOS Safari allows programmatic play() on them later.
@@ -35,10 +45,27 @@ window.AudioMan = (function () {
       if (ctx.state === "suspended") ctx.resume();
     } catch (e) { ctx = null; }
     players.forEach((p) => {
+      if (ctx) {
+        try {
+          const srcNode = ctx.createMediaElementSource(p);
+          const gain = ctx.createGain();
+          srcNode.connect(gain).connect(ctx.destination);
+          p._gain = gain;
+        } catch (e) { /* fall back to el.volume */ }
+      }
       p.src = SILENCE;
       const pr = p.play();
       if (pr && pr.catch) pr.catch(() => {});
     });
+  }
+
+  // Heal audio after iOS interruptions (app switch, screen lock, Siri...).
+  function resume() {
+    if (ctx && ctx.state !== "running") { const r = ctx.resume(); if (r && r.catch) r.catch(() => {}); }
+    if (unlocked && current && current.el.paused) {
+      const p = current.el.play();
+      if (p && p.catch) p.catch(() => {});
+    }
   }
 
   function crossfadeTo(src, key, targetVol, seconds) {
@@ -46,9 +73,10 @@ window.AudioMan = (function () {
     if (current && current.src === src) return;
     const dur = (seconds || 1.6) * 1000;
     const prev = current;
+    const prevFrom = prev ? getVol(prev.el) : 0;
     const el = players[flip = 1 - flip];
     el.src = src;
-    el.volume = 0;
+    setVol(el, 0);
     el.currentTime = 0;
     const p = el.play();
     if (p && p.catch) p.catch(() => {});
@@ -57,8 +85,8 @@ window.AudioMan = (function () {
     const t0 = performance.now();
     fadeTimer = setInterval(() => {
       const k = Math.min(1, (performance.now() - t0) / dur);
-      el.volume = muted ? 0 : targetVol * k;
-      if (prev) prev.el.volume = Math.max(0, (muted ? 0 : prev.targetVol) * (1 - k));
+      setVol(el, muted ? 0 : targetVol * k);
+      if (prev) setVol(prev.el, Math.max(0, (muted ? 0 : prevFrom) * (1 - k)));
       if (k >= 1) {
         clearInterval(fadeTimer);
         fadeTimer = null;
@@ -134,18 +162,18 @@ window.AudioMan = (function () {
 
   function setMuted(m) {
     muted = m;
-    if (current) current.el.volume = muted ? 0 : current.targetVol;
+    players.forEach((p) => { p.muted = m; }); // iOS honors .muted even when it ignores .volume
+    if (current) setVol(current.el, m ? 0 : current.targetVol);
   }
 
   return {
-    unlock,
+    unlock, resume,
     intro: () => crossfadeTo(TRACKS.intro, "intro", MUSIC_VOL.intro, 2),
     question: () => crossfadeTo(TRACKS.question, "question", MUSIC_VOL.question, 1.8),
     slideshow: (qIndex) =>
       crossfadeTo(TRACKS.slideshows[qIndex % TRACKS.slideshows.length], "slideshow", MUSIC_VOL.slideshow, 1.4),
     finale: () => crossfadeTo(TRACKS.finale, "finale", MUSIC_VOL.finale, 2.5),
-    duck: (v) => { if (current) current.el.volume = muted ? 0 : v; },
-    unduck: () => { if (current) current.el.volume = muted ? 0 : current.targetVol; },
+    duck: (v) => { if (current) setVol(current.el, muted ? 0 : v); },
     playCorrect, playWrong, playDrumroll, playTap, playFanfare,
     setMuted,
     isMuted: () => muted,
