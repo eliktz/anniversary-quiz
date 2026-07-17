@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>13 שנים של אהבה ❤️</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>">
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <button id="btn-mute" aria-label="השתק">🔊</button>
+
+  <!-- ================= INTRO ================= -->
+  <section id="screen-intro" class="screen">
+    <div id="floaters"></div>
+    <div class="intro-content">
+      <div class="intro-eyebrow">יום נישואין שמח!</div>
+      <h1 class="intro-title"><span class="num">13</span> שנים<br>של אהבה</h1>
+      <div class="intro-hearts">❤️ 💛 🧡</div>
+      <div id="intro-first">
+        <p class="intro-sub">החידון הגדול של אמא ואבא — ויונתן המנחה!</p>
+        <button id="btn-start" class="big-btn">הקישו כאן להתחלה ✨</button>
+      </div>
+      <div id="intro-ready" class="hidden">
+        <p class="intro-sub">שומעים מוזיקה? 🎵 הגבירו את הווליום!<br>13 שאלות, אחרי כל תשובה — הצצה לאלבום התמונות שלנו</p>
+        <button id="btn-go" class="big-btn gold">יאללה, מתחילים! 🎉</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUESTION ================= -->
+  <section id="screen-question" class="screen">
+    <header class="q-header">
+      <div id="progress"></div>
+      <div id="hearts-trail"></div>
+    </header>
+    <div class="q-card">
+      <h2 id="question-text"></h2>
+    </div>
+    <div id="answers"></div>
+    <div id="reveal-banner" class="hidden"></div>
+  </section>
+
+  <!-- ================= SLIDESHOW ================= -->
+  <section id="screen-slideshow" class="screen">
+    <div id="slide-stage"></div>
+    <div class="slide-vignette"></div>
+    <div id="slideshow-title"></div>
+    <div id="slide-dots"></div>
+    <div class="skip-hint">הקישו כדי להמשיך ⏭</div>
+  </section>
+
+  <!-- ================= END ================= -->
+  <section id="screen-end" class="screen">
+    <div class="end-content">
+      <div class="end-big">מזל טוב!</div>
+      <div class="end-title">אמא ואבא — 13 שנים ביחד</div>
+      <div class="end-line">מהצבא ועד היום, מסין ועד לרנקה,<br>עם לופץ ועם יונתן הנפלא 💙</div>
+      <div class="end-motto">והכל לטובה ❤️</div>
+      <button id="btn-again" class="big-btn">לשחק שוב 🔄</button>
+    </div>
+  </section>
+
+  <script src="js/data/questions.js"></script>
+  <script src="js/data/manifest.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
