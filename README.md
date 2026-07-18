@@ -31,7 +31,11 @@ vanilla JS/CSS. Hebrew RTL, optimized for iPad Safari.
 - `js/data/manifest.js` — generated photo manifest (per-question slideshows)
 - `assets/photos/` — processed photos (resized, EXIF/GPS stripped)
 - `assets/audio/` — music, transcoded to 112kbps
+- `tools/process_photos.py` — photo pipeline + question↔photo assignment map
 - Local dev: `python3 -m http.server 8137` and open http://localhost:8137
+
+**Full documentation — architecture, data formats, the iPad audio system,
+how it was built and verified: [docs/PROJECT.md](docs/PROJECT.md)**
 
 ## Credits
 
