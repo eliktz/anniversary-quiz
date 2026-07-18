@@ -250,7 +250,7 @@
     AudioMan.finale();
     const photos = window.PHOTOS.finale || [];
     currentPhotos = photos;
-    $("#slideshow-title").textContent = "13 שנים של אהבה ❤️";
+    $("#slideshow-title").textContent = "המשפחה שלנו 💙";
     renderDots(photos.length);
     show("#screen-slideshow");
     slideTapGuardUntil = performance.now() + 900;

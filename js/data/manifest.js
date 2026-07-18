@@ -487,75 +487,81 @@ window.PHOTOS = {
  "finale": [
   {
    "src": "assets/photos/finale/01.jpg",
+   "w": 414,
+   "h": 414,
+   "pos": "50% 42%"
+  },
+  {
+   "src": "assets/photos/finale/02.jpg",
    "w": 960,
    "h": 720,
    "pos": "50% 42%"
   },
   {
-   "src": "assets/photos/finale/02.jpg",
-   "w": 1600,
-   "h": 1200,
-   "pos": "65% 42%"
-  },
-  {
    "src": "assets/photos/finale/03.jpg",
-   "w": 1200,
-   "h": 1600,
-   "pos": "65% 42%"
+   "w": 768,
+   "h": 1024,
+   "pos": "50% 30%"
   },
   {
    "src": "assets/photos/finale/04.jpg",
-   "w": 640,
-   "h": 480,
-   "pos": "50% 65%"
-  },
-  {
-   "src": "assets/photos/finale/05.jpg",
-   "w": 414,
-   "h": 414,
-   "pos": "50% 42%"
-  },
-  {
-   "src": "assets/photos/finale/06.jpg",
-   "w": 414,
-   "h": 414,
-   "pos": "50% 42%"
-  },
-  {
-   "src": "assets/photos/finale/07.jpg",
    "w": 950,
    "h": 1267,
    "pos": "50% 42%"
   },
   {
-   "src": "assets/photos/finale/08.jpg",
-   "w": 1267,
-   "h": 950,
-   "pos": "65% 42%"
+   "src": "assets/photos/finale/05.jpg",
+   "w": 1200,
+   "h": 1600,
+   "pos": "65% 30%"
   },
   {
-   "src": "assets/photos/finale/09.jpg",
-   "w": 1600,
-   "h": 1200,
+   "src": "assets/photos/finale/06.jpg",
+   "w": 1276,
+   "h": 1600,
    "pos": "35% 42%"
   },
   {
-   "src": "assets/photos/finale/10.jpg",
-   "w": 550,
-   "h": 550,
-   "pos": "65% 65%"
+   "src": "assets/photos/finale/07.jpg",
+   "w": 1200,
+   "h": 1600,
+   "pos": "65% 42%"
   },
   {
-   "src": "assets/photos/finale/11.jpg",
+   "src": "assets/photos/finale/08.jpg",
+   "w": 1200,
+   "h": 1600,
+   "pos": "50% 30%"
+  },
+  {
+   "src": "assets/photos/finale/09.jpg",
+   "w": 1200,
+   "h": 1600,
+   "pos": "65% 30%"
+  },
+  {
+   "src": "assets/photos/finale/10.jpg",
    "w": 1600,
    "h": 900,
    "pos": "50% 65%"
   },
   {
+   "src": "assets/photos/finale/11.jpg",
+   "w": 1600,
+   "h": 1200,
+   "pos": "50% 42%"
+  },
+  {
    "src": "assets/photos/finale/12.jpg",
-   "w": 1200,
-   "h": 1600,
-   "pos": "65% 30%"
+   "w": 1267,
+   "h": 950,
+   "pos": "65% 42%"
+  },
+  {
+   "src": "assets/photos/finale/13.jpg",
+   "w": 1600,
+   "h": 1200,
+   "pos": "35% 42%"
   }
  ]
 };
