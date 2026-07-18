@@ -437,26 +437,50 @@ window.PHOTOS = {
   },
   {
    "src": "assets/photos/intro/02.jpg",
-   "w": 414,
-   "h": 414,
-   "pos": "50% 42%"
+   "w": 1600,
+   "h": 1200,
+   "pos": "35% 42%"
   },
   {
    "src": "assets/photos/intro/03.jpg",
-   "w": 414,
-   "h": 414,
+   "w": 960,
+   "h": 720,
    "pos": "50% 42%"
   },
   {
    "src": "assets/photos/intro/04.jpg",
+   "w": 1600,
+   "h": 1200,
+   "pos": "65% 30%"
+  },
+  {
+   "src": "assets/photos/intro/05.jpg",
    "w": 414,
    "h": 414,
    "pos": "50% 42%"
   },
   {
-   "src": "assets/photos/intro/05.jpg",
-   "w": 960,
-   "h": 720,
+   "src": "assets/photos/intro/06.jpg",
+   "w": 1200,
+   "h": 1600,
+   "pos": "50% 30%"
+  },
+  {
+   "src": "assets/photos/intro/07.jpg",
+   "w": 414,
+   "h": 414,
+   "pos": "50% 42%"
+  },
+  {
+   "src": "assets/photos/intro/08.jpg",
+   "w": 1267,
+   "h": 950,
+   "pos": "65% 42%"
+  },
+  {
+   "src": "assets/photos/intro/09.jpg",
+   "w": 414,
+   "h": 414,
    "pos": "50% 42%"
   }
  ],

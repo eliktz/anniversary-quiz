@@ -64,7 +64,7 @@
     const wrap = $("#floaters");
     (window.PHOTOS.intro || []).forEach((p, i) => {
       const d = document.createElement("div");
-      d.className = "floater f" + (i % 5);
+      d.className = "floater f" + (i % 9);
       d.style.backgroundImage = `url(${p.src})`;
       wrap.appendChild(d);
     });
